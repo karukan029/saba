@@ -12,3 +12,5 @@ extern crate alloc;
 
 // モジュール公開
 pub mod url;
+pub mod http;
+pub mod error;
