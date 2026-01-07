@@ -28,6 +28,21 @@ impl HttpResponse {
         )));
       }
     };
+
+    let (header, body) = match remaining.split_once("\n\n") {
+      Some((h, b)) => {
+        let mut headers = Vec::new();
+        for header in h.split('\n'){
+          let splitted_header: Vec<&str> = header.splitn(2, ':').collect();
+          headers.push(Header::new(
+            String::from(splitted_header[0].trim()),
+            String::from(splitted_header[1].trim())
+          ));
+        }
+        (headers, b)
+      },
+      None => (Vec::new(), remaining),
+    };
   }
 }
 
