@@ -1,6 +1,6 @@
 use alloc::string::String;
 use alloc::vec::Vec;
-use create::error::Error; 
+use crate::error::Error; 
 
 #[derive(Debug,Clone)]
 pub struct HttpResponse {
@@ -43,6 +43,46 @@ impl HttpResponse {
       },
       None => (Vec::new(), remaining),
     };
+
+    let status_parts: Vec<&str> = status_line.split(' ').collect();
+
+    Ok(Self {
+      version: String::from(status_parts[0]),
+      status_code: status_parts[1].parse::<u32>().unwrap_or(0),
+      reason: String::from(status_parts[2]),
+      headers: header,
+      body: String::from(body),
+    })
+  }
+
+  pub fn version(&self) -> String {
+    self.version.clone()
+  }
+
+  pub fn status_code(&self) -> u32 {
+    self.status_code
+  }
+
+  pub fn reason(&self) -> String {
+    self.reason.clone()
+  }
+
+  pub fn headers(&self) -> Vec<Header> {
+    self.headers.clone()
+  }
+
+  pub fn body(&self) -> String {
+    self.body.clone()
+  }
+
+  pub fn header_value(&self, name: &str) -> Result<String, String> {
+    for h in &self.headers {
+      if h.name == name {
+        return Ok(h.value.clone());
+      }
+    }
+
+    Err(format!("faild to find {} in headers", name))
   }
 }
 
